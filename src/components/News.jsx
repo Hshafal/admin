@@ -5,6 +5,7 @@ import myAxios from "../api/myAxios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import useConfirm from "../hooks/useConfirm";
+import { IMAGES_URL } from "../api/myAxios";
 
 function News() {
 	const navigate = useNavigate();
@@ -70,7 +71,7 @@ function News() {
 							<h2 className="text-xl font-bold mb-2">{news.title}</h2>
 							<p className="text-gray-700 mb-4">{news.description}</p>
 							<img
-								src={news.thumbnail ? `http://localhost:5000/uploads/${news.thumbnail}` : "/news3.jpg"}
+								src={news.thumbnail ? `${IMAGES_URL}/${news.thumbnail}` : "/news3.jpg"}
 								alt={news.title}
 								className="w-full h-48 object-cover rounded-md mb-4"
 							/>
