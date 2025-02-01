@@ -8,6 +8,7 @@ const NewsForm = () => {
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [isImportant, setIsImportant] = useState(false);
+	const [thumbnail, setThumbnail] = useState(null);
 	const queryClient = useQueryClient();
 
 	const { mutate, isPending } = useMutation({
@@ -19,6 +20,7 @@ const NewsForm = () => {
 			setTitle("");
 			setDescription("");
 			setIsImportant(false);
+			setThumbnail(null);
 			queryClient.invalidateQueries({ queryKey: ["news"] });
 			toast.success("تم إنشاء الخبر بنجاح");
 		},
@@ -30,8 +32,29 @@ const NewsForm = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		const formData = new FormData();
+
+		// first uplaod the image alone
+		formData.append("images", thumbnail);
+
+		const res = await myAxios.post("/upload", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		}); 
+
+		// send the rest of the data with the name of the file
+		formData.append("title", title);
+		formData.append("description", description);
+		formData.append("isImportant", isImportant);
+		formData.append("thumbnail", res.data.files[0].filename);
 		try {
-			mutate({ title, description, isImportant });
+			mutate({
+				title,
+				description,
+				isImportant,
+				thumbnail: res.data.files[0].filename,
+			});
 		} catch (error) {
 			console.error("Error creating news:", error);
 		}
@@ -75,7 +98,18 @@ const NewsForm = () => {
 						id="isImportant"
 						checked={isImportant}
 						onChange={(e) => setIsImportant(e.target.checked)}
-						
+					/>
+				</div>
+				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="thumbnail">
+						صورة الخبر
+					</label>
+					<input
+						type="file"
+						id="thumbnail"
+						accept="image/*"
+						onChange={(e) => setThumbnail(e.target.files[0])}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
 				<div className="flex items-center justify-between">

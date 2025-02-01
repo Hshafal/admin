@@ -61,6 +61,7 @@ function News() {
 	return (
 		<div className="container mx-auto p-4">
 			<ConfirmDeleteModal />
+
 			<NewsForm />
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
 				{data &&
@@ -68,7 +69,11 @@ function News() {
 						<div key={news._id} className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
 							<h2 className="text-xl font-bold mb-2">{news.title}</h2>
 							<p className="text-gray-700 mb-4">{news.description}</p>
-							<img src="/news3.jpg" alt={news.title} className="w-full h-48 object-cover rounded-md mb-4" />
+							<img
+								src={news.thumbnail ? `http://localhost:5000/uploads/${news.thumbnail}` : "/news3.jpg"}
+								alt={news.title}
+								className="w-full h-48 object-cover rounded-md mb-4"
+							/>
 							<div className="flex justify-between">
 								<button
 									onClick={() => handleEdit(news._id)}
