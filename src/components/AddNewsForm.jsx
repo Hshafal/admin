@@ -9,6 +9,9 @@ const NewsForm = () => {
 	const [description, setDescription] = useState("");
 	const [isImportant, setIsImportant] = useState(false);
 	const [thumbnail, setThumbnail] = useState(null);
+	const [date, setDate] = useState("");
+	const [category, setCategory] = useState("");
+
 	const queryClient = useQueryClient();
 
 	const { mutate, isPending } = useMutation({
@@ -21,6 +24,8 @@ const NewsForm = () => {
 			setDescription("");
 			setIsImportant(false);
 			setThumbnail(null);
+			setDate("");
+			setCategory("");
 			queryClient.invalidateQueries({ queryKey: ["news"] });
 			toast.success("تم إنشاء الخبر بنجاح");
 		},
@@ -34,26 +39,30 @@ const NewsForm = () => {
 		e.preventDefault();
 		const formData = new FormData();
 
-		// first uplaod the image alone
+		// first upload the image alone
 		formData.append("images", thumbnail);
 
 		const res = await myAxios.post("/upload", formData, {
 			headers: {
 				"Content-Type": "multipart/form-data",
 			},
-		}); 
+		});
 
 		// send the rest of the data with the name of the file
 		formData.append("title", title);
 		formData.append("description", description);
 		formData.append("isImportant", isImportant);
 		formData.append("thumbnail", res.data.files[0].filename);
+		formData.append("category", category); // Add category to formData
+		formData.append("date", date); // Add date to formData
 		try {
 			mutate({
 				title,
 				description,
 				isImportant,
 				thumbnail: res.data.files[0].filename,
+				category, // Include category in the mutation
+				date, // Include date in the mutation
 			});
 		} catch (error) {
 			console.error("Error creating news:", error);
@@ -89,6 +98,47 @@ const NewsForm = () => {
 						required
 					/>
 				</div>
+
+				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="thumbnail">
+						الصورة المصغرة
+					</label>
+					<input
+						type="file"
+						id="thumbnail"
+						accept="image/*"
+						onChange={(e) => setThumbnail(e.target.files[0])}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+					/>
+				</div>
+				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
+						التاريخ
+					</label>
+					<input
+						type="date"
+						id="date"
+						value={date}
+						onChange={(e) => setDate(e.target.value)}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+					/>
+				</div>
+				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+						الصنف
+					</label>
+					<select
+						id="category"
+						value={category}
+						onChange={(e) => setCategory(e.target.value)}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+					>
+						<option value="">اختر الصنف</option>
+						<option value="NEWS">NEWS</option>
+						<option value="ADD">ADD</option>
+						<option value="NOTIFICATION">NOTIFICATION</option>
+					</select>
+				</div>
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="isImportant">
 						مهم
@@ -98,18 +148,6 @@ const NewsForm = () => {
 						id="isImportant"
 						checked={isImportant}
 						onChange={(e) => setIsImportant(e.target.checked)}
-					/>
-				</div>
-				<div className="mb-4">
-					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="thumbnail">
-						صورة الخبر
-					</label>
-					<input
-						type="file"
-						id="thumbnail"
-						accept="image/*"
-						onChange={(e) => setThumbnail(e.target.files[0])}
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
 				<div className="flex items-center justify-between">

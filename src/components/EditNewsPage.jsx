@@ -10,6 +10,8 @@ const EditNewsPage = () => {
 	const [description, setDescription] = useState("");
 	const [isImportant, setIsImportant] = useState(false);
 	const [thumbnail, setThumbnail] = useState(null);
+	const [date, setDate] = useState("");
+	const [category, setCategory] = useState("");
 	const queryClient = useQueryClient();
 	const { id } = useParams();
 
@@ -26,6 +28,12 @@ const EditNewsPage = () => {
 			setTitle(data.title);
 			setDescription(data.description);
 			setIsImportant(data.isImportant);
+			setCategory(data.category);
+
+			// Convert the date to yyyy-MM-dd format
+			const dateObj = new Date(data.date);
+			const formattedDate = dateObj.toISOString().split("T")[0];
+			setDate(formattedDate);
 		}
 	}, [isSuccess, data, id]);
 
@@ -47,7 +55,7 @@ const EditNewsPage = () => {
 		e.preventDefault();
 		const formData = new FormData();
 
-		// first uplaod the image alone
+		// first upload the image alone
 		formData.append("images", thumbnail);
 
 		const res = await myAxios.post("/upload", formData, {
@@ -61,15 +69,19 @@ const EditNewsPage = () => {
 		formData.append("description", description);
 		formData.append("isImportant", isImportant);
 		formData.append("thumbnail", res.data.files[0].filename);
+		formData.append("category", category); // Add category to formData
+		formData.append("date", date); // Add date to formData
 		try {
 			mutate({
 				title,
 				description,
 				isImportant,
 				thumbnail: res.data.files[0].filename,
+				category, // Include category in the mutation
+				date, // Include date in the mutation
 			});
 		} catch (error) {
-			console.error("Error creating news:", error);
+			console.error("Error updating news:", error);
 		}
 	};
 
@@ -127,6 +139,36 @@ const EditNewsPage = () => {
 						onChange={(e) => setThumbnail(e.target.files[0])}
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
+				</div>
+				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
+						التاريخ
+					</label>
+					<input
+						type="date"
+						id="date"
+						value={date}
+						onChange={(e) => setDate(e.target.value)}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						required
+					/>
+				</div>
+				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+						الصنف
+					</label>
+					<select
+						id="category"
+						value={category}
+						onChange={(e) => setCategory(e.target.value)}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						required
+					>
+						<option value="">اختر الصنف</option>
+						<option value="NEWS">NEWS</option>
+						<option value="ADD">ADD</option>
+						<option value="NOTIFICATION">NOTIFICATION</option>
+					</select>
 				</div>
 				<div className="flex items-center justify-between">
 					<button
