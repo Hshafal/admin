@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import myAxios from "../api/myAxios";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -90,12 +92,11 @@ const NewsForm = () => {
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
 						الوصف
 					</label>
-					<textarea
+					<ReactQuill
 						id="description"
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-						required
+						onChange={setDescription}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
 
@@ -135,7 +136,7 @@ const NewsForm = () => {
 					>
 						<option value="">اختر الصنف</option>
 						<option value="NEWS">NEWS</option>
-						<option value="ADD">ADD</option>
+						<option value="AD">AD</option>
 						<option value="NOTIFICATION">NOTIFICATION</option>
 					</select>
 				</div>

@@ -69,7 +69,11 @@ function News() {
 					data.map((news) => (
 						<div key={news._id} className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
 							<h2 className="text-xl font-bold mb-2">{news.title}</h2>
-							<p className="text-gray-700 mb-4">{news.description}</p>
+							<div
+								className="border p-4 rounded-lg shadow-md"
+								dangerouslySetInnerHTML={{ __html: news.description }}
+							/>
+							{/* <p className="text-gray-700 mb-4">{news.description}</p> */}
 							<img
 								src={news.thumbnail ? `${IMAGES_URL}/${news.thumbnail}` : "/news3.jpg"}
 								alt={news.title}

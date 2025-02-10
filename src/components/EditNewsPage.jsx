@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import myAxios from "../api/myAxios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -56,19 +58,22 @@ const EditNewsPage = () => {
 		const formData = new FormData();
 
 		// first upload the image alone
-		formData.append("images", thumbnail);
+		if (thumbnail) {
+			formData.append("images", thumbnail);
 
-		const res = await myAxios.post("/upload", formData, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
+			const res = await myAxios.post("/upload", formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
 
-		// send the rest of the data with the name of the file
+			formData.append("thumbnail", res.data.files[0].filename);
+		}
+
+		// send the rest of the data
 		formData.append("title", title);
 		formData.append("description", description);
 		formData.append("isImportant", isImportant);
-		formData.append("thumbnail", res.data.files[0].filename);
 		formData.append("category", category); // Add category to formData
 		formData.append("date", date); // Add date to formData
 		try {
@@ -76,7 +81,7 @@ const EditNewsPage = () => {
 				title,
 				description,
 				isImportant,
-				thumbnail: res.data.files[0].filename,
+				thumbnail: formData.get("thumbnail") || data.thumbnail,
 				category, // Include category in the mutation
 				date, // Include date in the mutation
 			});
@@ -109,12 +114,11 @@ const EditNewsPage = () => {
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
 						الوصف
 					</label>
-					<textarea
+					<ReactQuill
 						id="description"
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-						required
+						onChange={setDescription}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
 				<div className="mb-4">
@@ -166,7 +170,7 @@ const EditNewsPage = () => {
 					>
 						<option value="">اختر الصنف</option>
 						<option value="NEWS">NEWS</option>
-						<option value="ADD">ADD</option>
+						<option value="AD">AD</option>
 						<option value="NOTIFICATION">NOTIFICATION</option>
 					</select>
 				</div>
