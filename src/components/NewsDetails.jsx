@@ -2,6 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import myAxios, { IMAGES_URL } from "../api/myAxios";
+import { formatDate } from "../utils";
 
 const NewsDetailsPage = () => {
 	const { id } = useParams();
@@ -16,11 +17,6 @@ const NewsDetailsPage = () => {
 
 	if (isLoading) return <div>جاري التحميل...</div>;
 	if (error) return <div>حدث خطأ أثناء جلب البيانات</div>;
-
-	const formatDate = (dateString) => {
-		const options = { year: "numeric", month: "long", day: "numeric" };
-		return new Date(dateString).toLocaleDateString(undefined, options);
-	};
 
 	return (
 		<div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
