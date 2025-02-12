@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import myAxios from "../api/myAxios";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 
 const NewsForm = () => {
-	const [title, setTitle] = useState("");
-	const [description, setDescription] = useState("");
-	const [isImportant, setIsImportant] = useState(false);
-	const [thumbnail, setThumbnail] = useState(null);
-	const [date, setDate] = useState("");
-	const [category, setCategory] = useState("");
-
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		reset,
+		formState: { isSubmitting },
+	} = useForm();
 	const queryClient = useQueryClient();
 
 	const { mutate, isPending } = useMutation({
@@ -21,13 +22,9 @@ const NewsForm = () => {
 			const res = await myAxios.post("/news", formData);
 			return res.data;
 		},
-		onSuccess: () => {
-			setTitle("");
-			setDescription("");
-			setIsImportant(false);
-			setThumbnail(null);
-			setDate("");
-			setCategory("");
+		onSuccess: (data) => {
+			console.log(data);
+			reset();
 			queryClient.invalidateQueries({ queryKey: ["news"] });
 			toast.success("تم إنشاء الخبر بنجاح");
 		},
@@ -37,34 +34,46 @@ const NewsForm = () => {
 		},
 	});
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const onSubmit = async (data) => {
 		const formData = new FormData();
+		const allImages = [...data.images, data.thumbnail[0]]; // Combine all images
 
-		// first upload the image alone
-		formData.append("images", thumbnail);
+		// Append all images to the FormData
+		allImages.forEach((file) => {
+			formData.append("images", file);
+		});
 
+		// Upload all images in a single request
 		const res = await myAxios.post("/upload", formData, {
 			headers: {
 				"Content-Type": "multipart/form-data",
 			},
 		});
 
-		// send the rest of the data with the name of the file
-		formData.append("title", title);
-		formData.append("description", description);
-		formData.append("isImportant", isImportant);
-		formData.append("thumbnail", res.data.files[0].filename);
-		formData.append("category", category); // Add category to formData
-		formData.append("date", date); // Add date to formData
+		const uploadedImageFilenames = res.data.files.map((file) => file.filename);
+
+		// The last filename is the thumbnail
+		const thumbnailFilename = uploadedImageFilenames.pop();
+		const imagesFilenames = uploadedImageFilenames;
+
+		// Append the rest of the data with the filenames
+		formData.append("title", data.title);
+		formData.append("description", data.description);
+		formData.append("isImportant", data.isImportant);
+		formData.append("thumbnail", thumbnailFilename);
+		formData.append("images", JSON.stringify(imagesFilenames));
+		formData.append("category", data.category);
+		formData.append("date", data.date);
+
 		try {
 			mutate({
-				title,
-				description,
-				isImportant,
-				thumbnail: res.data.files[0].filename,
-				category, // Include category in the mutation
-				date, // Include date in the mutation
+				title: data.title,
+				description: data.description,
+				isImportant: data.isImportant,
+				thumbnail: thumbnailFilename,
+				images: imagesFilenames,
+				category: data.category,
+				date: data.date,
 			});
 		} catch (error) {
 			console.error("Error creating news:", error);
@@ -73,8 +82,8 @@ const NewsForm = () => {
 
 	return (
 		<div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md" dir="rtl">
-			<h2 className="text-2xl font-bold mb-6">إنشاء خبر</h2>
-			<form onSubmit={handleSubmit}>
+			<h2 className="text-2xl text-center font-bold mb-6">إنشاء محتوى</h2>
+			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
 						العنوان
@@ -83,9 +92,7 @@ const NewsForm = () => {
 						type="text"
 						id="title"
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						value={title}
-						onChange={(e) => setTitle(e.target.value)}
-						required
+						{...register("title", { required: true })}
 					/>
 				</div>
 				<div className="mb-4">
@@ -94,9 +101,9 @@ const NewsForm = () => {
 					</label>
 					<ReactQuill
 						id="description"
-						value={description}
-						onChange={setDescription}
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("description", { required: true })}
+						onChange={(value) => setValue("description", value)}
 					/>
 				</div>
 
@@ -108,10 +115,25 @@ const NewsForm = () => {
 						type="file"
 						id="thumbnail"
 						accept="image/*"
-						onChange={(e) => setThumbnail(e.target.files[0])}
+						{...register("thumbnail")}
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
+
+				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="images">
+						الصور
+					</label>
+					<input
+						type="file"
+						id="images"
+						accept="image/*"
+						multiple
+						{...register("images")}
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+					/>
+				</div>
+
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
 						التاريخ
@@ -119,8 +141,7 @@ const NewsForm = () => {
 					<input
 						type="date"
 						id="date"
-						value={date}
-						onChange={(e) => setDate(e.target.value)}
+						{...register("date")}
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
@@ -130,34 +151,29 @@ const NewsForm = () => {
 					</label>
 					<select
 						id="category"
-						value={category}
-						onChange={(e) => setCategory(e.target.value)}
+						{...register("category")}
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					>
 						<option value="">اختر الصنف</option>
 						<option value="NEWS">NEWS</option>
 						<option value="AD">AD</option>
 						<option value="NOTIFICATION">NOTIFICATION</option>
+						<option value="ACTIVITY">ACTIVITY</option>
 					</select>
 				</div>
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="isImportant">
 						مهم
 					</label>
-					<input
-						type="checkbox"
-						id="isImportant"
-						checked={isImportant}
-						onChange={(e) => setIsImportant(e.target.checked)}
-					/>
+					<input type="checkbox" id="isImportant" {...register("isImportant")} />
 				</div>
 				<div className="flex items-center justify-between">
 					<button
-						disabled={isPending}
+						disabled={isPending || isSubmitting}
 						type="submit"
 						className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
 					>
-						{isPending ? "جاري التحميل" : "إضافة"}
+						{isPending || isSubmitting ? "جاري التحميل" : "إضافة"}
 					</button>
 				</div>
 			</form>
