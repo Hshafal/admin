@@ -186,6 +186,7 @@ const EditNewsPage = () => {
 						<option value="AD">AD</option>
 						<option value="NOTIFICATION">NOTIFICATION</option>
 						<option value="ACTIVITY">ACTIVITY</option>
+						<option value="EVENT">EVENT</option>
 					</select>
 				</div>
 				<div className="flex items-center justify-between">
