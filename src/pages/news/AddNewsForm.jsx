@@ -44,7 +44,7 @@ const NewsForm = () => {
 		});
 
 		// Upload all images in a single request
-		const res = await myAxios.post("/upload", formData, {
+		const res = await myAxios.post("/upload/images", formData, {
 			headers: {
 				"Content-Type": "multipart/form-data",
 			},
