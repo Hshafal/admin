@@ -58,7 +58,11 @@ const NewsForm = () => {
 
 		// Append the rest of the data with the filenames
 		formData.append("title", data.title);
+		formData.append("titleEnglish", data.titleEnglish);
+		formData.append("titleRussian", data.titleRussian);
 		formData.append("description", data.description);
+		formData.append("descriptionEnglish", data.descriptionEnglish);
+		formData.append("descriptionRussian", data.descriptionRussian);
 		formData.append("isImportant", data.isImportant);
 		formData.append("thumbnail", thumbnailFilename);
 		formData.append("images", JSON.stringify(imagesFilenames));
@@ -68,7 +72,11 @@ const NewsForm = () => {
 		try {
 			mutate({
 				title: data.title,
+				titleEnglish: data.titleEnglish,
+				titleRussian: data.titleRussian,
 				description: data.description,
+				descriptionEnglish: data.descriptionEnglish,
+				descriptionRussian: data.descriptionRussian,
 				isImportant: data.isImportant,
 				thumbnail: thumbnailFilename,
 				images: imagesFilenames,
@@ -98,6 +106,34 @@ const NewsForm = () => {
 				<div className="mb-4">
 					<label
 						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="titleEnglish"
+					>
+						العنوان بالإنجليزية
+					</label>
+					<input
+						type="text"
+						id="titleEnglish"
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("titleEnglish")}
+					/>
+				</div>
+				<div className="mb-4">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="titleRussian"
+					>
+						العنوان بالروسية
+					</label>
+					<input
+						type="text"
+						id="titleRussian"
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("titleRussian")}
+					/>
+				</div>
+				<div className="mb-4">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
 						htmlFor="description"
 					>
 						الوصف
@@ -109,7 +145,34 @@ const NewsForm = () => {
 						onChange={(value) => setValue("description", value)}
 					/>
 				</div>
-
+				<div className="mb-4">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="descriptionEnglish"
+					>
+						الوصف بالإنجليزية
+					</label>
+					<ReactQuill
+						id="descriptionEnglish"
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("descriptionEnglish")}
+						onChange={(value) => setValue("descriptionEnglish", value)}
+					/>
+				</div>
+				<div className="mb-4">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="descriptionRussian"
+					>
+						الوصف بالروسية
+					</label>
+					<ReactQuill
+						id="descriptionRussian"
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("descriptionRussian")}
+						onChange={(value) => setValue("descriptionRussian", value)}
+					/>
+				</div>
 				<div className="mb-4">
 					<label
 						className="block text-gray-700 text-sm font-bold mb-2"
@@ -125,7 +188,6 @@ const NewsForm = () => {
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
-
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="images">
 						الصور
@@ -139,7 +201,6 @@ const NewsForm = () => {
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
-
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
 						التاريخ

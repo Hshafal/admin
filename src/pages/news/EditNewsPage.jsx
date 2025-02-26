@@ -30,7 +30,11 @@ const EditNewsPage = () => {
 	useEffect(() => {
 		if (id && data) {
 			setValue("title", data.title);
+			setValue("titleEnglish", data.titleEnglish);
+			setValue("titleRussian", data.titleRussian);
 			setValue("description", data.description);
+			setValue("descriptionEnglish", data.descriptionEnglish);
+			setValue("descriptionRussian", data.descriptionRussian);
 			setValue("isImportant", data.isImportant);
 			setValue("category", data.category);
 
@@ -79,7 +83,11 @@ const EditNewsPage = () => {
 
 		// Append the rest of the data with the filenames
 		formDataToSend.append("title", formData.title);
+		formDataToSend.append("titleEnglish", formData.titleEnglish);
+		formDataToSend.append("titleRussian", formData.titleRussian);
 		formDataToSend.append("description", formData.description);
+		formDataToSend.append("descriptionEnglish", formData.descriptionEnglish);
+		formDataToSend.append("descriptionRussian", formData.descriptionRussian);
 		formDataToSend.append("isImportant", formData.isImportant);
 		formDataToSend.append("thumbnail", thumbnailFilename);
 		formDataToSend.append("images", JSON.stringify(imagesFilenames));
@@ -89,7 +97,11 @@ const EditNewsPage = () => {
 		try {
 			mutate({
 				title: formData.title,
+				titleEnglish: formData.titleEnglish,
+				titleRussian: formData.titleRussian,
 				description: formData.description,
+				descriptionEnglish: formData.descriptionEnglish,
+				descriptionRussian: formData.descriptionRussian,
 				isImportant: formData.isImportant,
 				thumbnail: thumbnailFilename,
 				images: imagesFilenames,
@@ -120,6 +132,28 @@ const EditNewsPage = () => {
 					/>
 				</div>
 				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="titleEnglish">
+						العنوان بالإنجليزية
+					</label>
+					<input
+						type="text"
+						id="titleEnglish"
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("titleEnglish")}
+					/>
+				</div>
+				<div className="mb-4">
+					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="titleRussian">
+						العنوان بالروسية
+					</label>
+					<input
+						type="text"
+						id="titleRussian"
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("titleRussian")}
+					/>
+				</div>
+				<div className="mb-4">
 					<label
 						className="block text-gray-700 text-sm font-bold mb-2"
 						htmlFor="description"
@@ -131,6 +165,34 @@ const EditNewsPage = () => {
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 						{...register("description")}
 						onChange={(value) => setValue("description", value)}
+					/>
+				</div>
+				<div className="mb-4">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="descriptionEnglish"
+					>
+						الوصف بالإنجليزية
+					</label>
+					<ReactQuill
+						id="descriptionEnglish"
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("descriptionEnglish")}
+						onChange={(value) => setValue("descriptionEnglish", value)}
+					/>
+				</div>
+				<div className="mb-4">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="descriptionRussian"
+					>
+						الوصف بالروسية
+					</label>
+					<ReactQuill
+						id="descriptionRussian"
+						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+						{...register("descriptionRussian")}
+						onChange={(value) => setValue("descriptionRussian", value)}
 					/>
 				</div>
 				<div className="mb-4">
