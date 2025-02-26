@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import NewsForm from "./AddNewsForm";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import myAxios from "../api/myAxios";
+import myAxios from "../../api/myAxios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import useConfirm from "../hooks/useConfirm";
-import { IMAGES_URL } from "../api/myAxios";
-import { formatDate } from "../utils";
+import useConfirm from "../../hooks/useConfirm";
+import { UPLOAD_URL } from "../../api/myAxios";
+import { formatDate } from "../../utils";
 
 function News() {
 	const navigate = useNavigate();
@@ -102,7 +102,11 @@ function NewsList() {
 									<td className="py-2 px-4 border-b">{news.title}</td>
 									<td className="py-2 px-4 border-b">
 										<img
-											src={news.thumbnail ? `${IMAGES_URL}/${news.thumbnail}` : "/news3.jpg"}
+											src={
+												news.thumbnail
+													? `${UPLOAD_URL}/${news.thumbnail}`
+													: "/news3.jpg"
+											}
 											alt={news.title}
 											className="w-24 h-16 object-cover rounded-md"
 										/>

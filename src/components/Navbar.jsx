@@ -25,9 +25,18 @@ const Navbar = () => {
 			<div className="container mx-auto flex justify-between items-center">
 				<div className="text-white text-lg font-bold">أدمن الملحقية</div>
 				<div className="flex gap-5">
-					<a href="/" className="text-white hover:text-gray-300">
-						أخبار
-					</a>
+					<button
+						onClick={() => navigate("/")}
+						className="text-white hover:text-gray-300"
+					>
+						محتوى
+					</button>
+					<button
+						onClick={() => navigate("/pdfs")}
+						className="text-white hover:text-gray-300"
+					>
+						تعميمات
+					</button>
 					<button onClick={handleLogout} className="text-white hover:text-gray-300">
 						تسجيل خروج
 					</button>

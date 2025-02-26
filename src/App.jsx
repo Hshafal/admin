@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import News from "./components/News";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
-import EditNewsPage from "./components/EditNewsPage";
-import NewsDetailsPage from "./components/NewsDetails";
+import News from "./pages/news/News";
+import EditNewsPage from "./pages/news/EditNewsPage";
+import NewsDetailsPage from "./pages/news/NewsDetails";
+import PDFs from "./pages/pdf";
 
 function App() {
 	return (
@@ -12,6 +13,7 @@ function App() {
 				<Navbar />
 				<Routes>
 					<Route path="/" element={<News />} />
+					<Route path="/pdfs" element={<PDFs />} />
 					<Route path="/news/:id" element={<NewsDetailsPage />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/edit-news/:id" element={<EditNewsPage />} />

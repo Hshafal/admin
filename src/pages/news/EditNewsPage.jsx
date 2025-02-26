@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import myAxios from "../api/myAxios";
-import { useMutation } from "@tanstack/react-query";
+import myAxios from "../../api/myAxios";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
-const NewsForm = () => {
+const EditNewsPage = () => {
 	const {
 		register,
 		handleSubmit,
@@ -16,35 +17,55 @@ const NewsForm = () => {
 		formState: { isSubmitting },
 	} = useForm();
 	const queryClient = useQueryClient();
+	const { id } = useParams();
 
-	const { mutate, isPending } = useMutation({
-		mutationFn: async (formData) => {
-			const res = await myAxios.post("/news", formData);
+	const { data, isLoading, error } = useQuery({
+		queryKey: ["news", id],
+		queryFn: async () => {
+			const res = await myAxios.get(`/news/${id}`);
 			return res.data;
-		},
-		onSuccess: (data) => {
-			console.log(data);
-			reset();
-			queryClient.invalidateQueries({ queryKey: ["news"] });
-			toast.success("تم إنشاء الخبر بنجاح");
-		},
-		onError: (error) => {
-			console.log(error);
-			toast.error("فشل في إنشاء الخبر");
 		},
 	});
 
-	const onSubmit = async (data) => {
-		const formData = new FormData();
-		const allImages = [...data.images, data.thumbnail[0]]; // Combine all images
+	useEffect(() => {
+		if (id && data) {
+			setValue("title", data.title);
+			setValue("description", data.description);
+			setValue("isImportant", data.isImportant);
+			setValue("category", data.category);
+
+			// Convert the date to yyyy-MM-dd format
+			const dateObj = new Date(data.date);
+			const formattedDate = dateObj.toISOString().split("T")[0];
+			setValue("date", formattedDate);
+		}
+	}, [data, id, setValue]);
+
+	const { mutate, isPending } = useMutation({
+		mutationFn: async (formData) => {
+			const res = await myAxios.put(`/news/${id}`, formData);
+			return res.data;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["news"] });
+			toast.success("تم تعديل الخبر بنجاح");
+		},
+		onError: () => {
+			toast.error("فشل في تعديل الخبر");
+		},
+	});
+
+	const onSubmit = async (formData) => {
+		const formDataToSend = new FormData();
+		const allImages = [...formData.images, formData.thumbnail[0]]; // Combine all images
 
 		// Append all images to the FormData
 		allImages.forEach((file) => {
-			formData.append("images", file);
+			formDataToSend.append("images", file);
 		});
 
 		// Upload all images in a single request
-		const res = await myAxios.post("/upload", formData, {
+		const res = await myAxios.post("/upload/images", formDataToSend, {
 			headers: {
 				"Content-Type": "multipart/form-data",
 			},
@@ -57,32 +78,35 @@ const NewsForm = () => {
 		const imagesFilenames = uploadedImageFilenames;
 
 		// Append the rest of the data with the filenames
-		formData.append("title", data.title);
-		formData.append("description", data.description);
-		formData.append("isImportant", data.isImportant);
-		formData.append("thumbnail", thumbnailFilename);
-		formData.append("images", JSON.stringify(imagesFilenames));
-		formData.append("category", data.category);
-		formData.append("date", data.date);
+		formDataToSend.append("title", formData.title);
+		formDataToSend.append("description", formData.description);
+		formDataToSend.append("isImportant", formData.isImportant);
+		formDataToSend.append("thumbnail", thumbnailFilename);
+		formDataToSend.append("images", JSON.stringify(imagesFilenames));
+		formDataToSend.append("category", formData.category);
+		formDataToSend.append("date", formData.date);
 
 		try {
 			mutate({
-				title: data.title,
-				description: data.description,
-				isImportant: data.isImportant,
+				title: formData.title,
+				description: formData.description,
+				isImportant: formData.isImportant,
 				thumbnail: thumbnailFilename,
 				images: imagesFilenames,
-				category: data.category,
-				date: data.date,
+				category: formData.category,
+				date: formData.date,
 			});
 		} catch (error) {
-			console.error("Error creating news:", error);
+			console.error("Error updating news:", error);
 		}
 	};
 
+	if (isLoading) return <div>جاري التحميل...</div>;
+	if (error) return <div>حدث خطأ أثناء جلب البيانات</div>;
+
 	return (
 		<div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md" dir="rtl">
-			<h2 className="text-2xl text-center font-bold mb-6">إنشاء محتوى</h2>
+			<h2 className="text-2xl text-center font-bold mb-6">تعديل المحتوى</h2>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
@@ -96,20 +120,34 @@ const NewsForm = () => {
 					/>
 				</div>
 				<div className="mb-4">
-					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="description"
+					>
 						الوصف
 					</label>
 					<ReactQuill
 						id="description"
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						{...register("description", { required: true })}
+						{...register("description")}
 						onChange={(value) => setValue("description", value)}
 					/>
 				</div>
-
 				<div className="mb-4">
-					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="thumbnail">
-						الصورة المصغرة
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="isImportant"
+					>
+						مهم
+					</label>
+					<input type="checkbox" id="isImportant" {...register("isImportant")} />
+				</div>
+				<div className="mb-4">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="thumbnail"
+					>
+						صورة الخبر
 					</label>
 					<input
 						type="file"
@@ -119,7 +157,6 @@ const NewsForm = () => {
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
-
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="images">
 						الصور
@@ -133,7 +170,6 @@ const NewsForm = () => {
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
-
 				<div className="mb-4">
 					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
 						التاريخ
@@ -141,17 +177,20 @@ const NewsForm = () => {
 					<input
 						type="date"
 						id="date"
-						{...register("date")}
+						{...register("date", { required: true })}
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					/>
 				</div>
 				<div className="mb-4">
-					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="category"
+					>
 						الصنف
 					</label>
 					<select
 						id="category"
-						{...register("category")}
+						{...register("category", { required: true })}
 						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					>
 						<option value="">اختر الصنف</option>
@@ -162,19 +201,13 @@ const NewsForm = () => {
 						<option value="EVENT">EVENT</option>
 					</select>
 				</div>
-				<div className="mb-4">
-					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="isImportant">
-						مهم
-					</label>
-					<input type="checkbox" id="isImportant" {...register("isImportant")} />
-				</div>
 				<div className="flex items-center justify-between">
 					<button
 						disabled={isPending || isSubmitting}
 						type="submit"
 						className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
 					>
-						{isPending || isSubmitting ? "جاري التحميل" : "إضافة"}
+						{isPending || isSubmitting ? "جاري التحميل" : "تعديل"}
 					</button>
 				</div>
 			</form>
@@ -182,4 +215,4 @@ const NewsForm = () => {
 	);
 };
 
-export default NewsForm;
+export default EditNewsPage;
