@@ -27,7 +27,7 @@ function PDFs() {
 }
 
 function PDFList() {
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const [openDeleteModal, ConfirmDeleteModal] = useConfirm();
 
@@ -60,9 +60,9 @@ function PDFList() {
 		}, "Do you want to delete this PDF?");
 	};
 
-	const handleEdit = (pdfId) => {
-		navigate(`/edit-pdfs/${pdfId}`);
-	};
+	// const handleEdit = (pdfId) => {
+	// 	navigate(`/edit-pdfs/${pdfId}`);
+	// };
 
 	// const handleRowClick = (pdfId) => {
 	// 	navigate(`/pdfs/${pdfId}`);
@@ -100,7 +100,7 @@ function PDFList() {
 								<td className="py-2 px-4 border-b">{formatDate(pdf.date)}</td>
 								<td className="py-2 px-4 border-b">{pdf.category}</td>
 								<td className="py-2 px-4 border-b">
-									<button
+									{/* <button
 										onClick={(e) => {
 											e.stopPropagation(); // Prevent row click
 											handleEdit(pdf._id);
@@ -108,7 +108,7 @@ function PDFList() {
 										className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mr-2"
 									>
 										Edit
-									</button>
+									</button> */}
 									<button
 										onClick={(e) => {
 											e.stopPropagation(); // Prevent row click
