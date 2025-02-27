@@ -82,8 +82,9 @@ function PDFList() {
 			<table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
 				<thead className="bg-gray-50">
 					<tr>
-						<th className="py-2 px-4 border-b">Title</th>
-						<th className="py-2 px-4 border-b">Date</th>
+						<th className="py-2 px-4 border-b">العنوان</th>
+						<th className="py-2 px-4 border-b">التاريخ</th>
+						<th className="py-2 px-4 border-b">الصنف</th>
 						<th className="py-2 px-4 border-b">Actions</th>
 					</tr>
 				</thead>
@@ -97,6 +98,7 @@ function PDFList() {
 									</a>
 								</td>
 								<td className="py-2 px-4 border-b">{formatDate(pdf.date)}</td>
+								<td className="py-2 px-4 border-b">{pdf.category}</td>
 								<td className="py-2 px-4 border-b">
 									<button
 										onClick={(e) => {
