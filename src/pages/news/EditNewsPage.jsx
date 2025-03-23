@@ -1,12 +1,12 @@
+// EditNewsPage.js
 import React, { useEffect } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import myAxios from "../../api/myAxios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import ReachEditor from "../../components/RichEditor"; // Import the updated ReachEditor component
 
 const EditNewsPage = () => {
 	const {
@@ -117,7 +117,7 @@ const EditNewsPage = () => {
 	if (error) return <div>حدث خطأ أثناء جلب البيانات</div>;
 
 	return (
-		<div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md" dir="rtl">
+		<div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md" dir="rtl">
 			<h2 className="text-2xl text-center font-bold mb-6">تعديل المحتوى</h2>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className="mb-4">
@@ -132,7 +132,10 @@ const EditNewsPage = () => {
 					/>
 				</div>
 				<div className="mb-4">
-					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="titleEnglish">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="titleEnglish"
+					>
 						العنوان بالإنجليزية
 					</label>
 					<input
@@ -143,7 +146,10 @@ const EditNewsPage = () => {
 					/>
 				</div>
 				<div className="mb-4">
-					<label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="titleRussian">
+					<label
+						className="block text-gray-700 text-sm font-bold mb-2"
+						htmlFor="titleRussian"
+					>
 						العنوان بالروسية
 					</label>
 					<input
@@ -160,11 +166,11 @@ const EditNewsPage = () => {
 					>
 						الوصف
 					</label>
-					<ReactQuill
+					<ReachEditor
 						id="description"
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						{...register("description")}
-						onChange={(value) => setValue("description", value)}
+						register={register}
+						setValue={setValue}
+						required
 					/>
 				</div>
 				<div className="mb-4">
@@ -174,12 +180,7 @@ const EditNewsPage = () => {
 					>
 						الوصف بالإنجليزية
 					</label>
-					<ReactQuill
-						id="descriptionEnglish"
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						{...register("descriptionEnglish")}
-						onChange={(value) => setValue("descriptionEnglish", value)}
-					/>
+					<ReachEditor id="descriptionEnglish" register={register} setValue={setValue} />
 				</div>
 				<div className="mb-4">
 					<label
@@ -188,12 +189,7 @@ const EditNewsPage = () => {
 					>
 						الوصف بالروسية
 					</label>
-					<ReactQuill
-						id="descriptionRussian"
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						{...register("descriptionRussian")}
-						onChange={(value) => setValue("descriptionRussian", value)}
-					/>
+					<ReachEditor id="descriptionRussian" register={register} setValue={setValue} />
 				</div>
 				<div className="mb-4">
 					<label

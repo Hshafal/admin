@@ -1,11 +1,11 @@
+// NewsForm.js
 import React from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import myAxios from "../../api/myAxios";
+import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import myAxios from "../../api/myAxios";
+import ReachEditor from "../../components/RichEditor"; // Import the ReachEditor component
 
 const NewsForm = () => {
 	const {
@@ -23,13 +23,12 @@ const NewsForm = () => {
 			return res.data;
 		},
 		onSuccess: (data) => {
-			console.log(data);
 			reset();
 			queryClient.invalidateQueries({ queryKey: ["news"] });
 			toast.success("تم إنشاء الخبر بنجاح");
 		},
 		onError: (error) => {
-			console.log(error);
+			console.error(error);
 			toast.error("فشل في إنشاء الخبر");
 		},
 	});
@@ -51,9 +50,7 @@ const NewsForm = () => {
 		});
 
 		const uploadedImageFilenames = res.data.files.map((file) => file.filename);
-
-		// The last filename is the thumbnail
-		const thumbnailFilename = uploadedImageFilenames.pop();
+		const thumbnailFilename = uploadedImageFilenames.pop(); // Last filename is the thumbnail
 		const imagesFilenames = uploadedImageFilenames;
 
 		// Append the rest of the data with the filenames
@@ -89,7 +86,7 @@ const NewsForm = () => {
 	};
 
 	return (
-		<div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md" dir="rtl">
+		<div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md" dir="rtl">
 			<h2 className="text-2xl text-center font-bold mb-6">إنشاء محتوى</h2>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className="mb-4">
@@ -131,48 +128,11 @@ const NewsForm = () => {
 						{...register("titleRussian")}
 					/>
 				</div>
-				<div className="mb-4">
-					<label
-						className="block text-gray-700 text-sm font-bold mb-2"
-						htmlFor="description"
-					>
-						الوصف
-					</label>
-					<ReactQuill
-						id="description"
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						{...register("description", { required: true })}
-						onChange={(value) => setValue("description", value)}
-					/>
-				</div>
-				<div className="mb-4">
-					<label
-						className="block text-gray-700 text-sm font-bold mb-2"
-						htmlFor="descriptionEnglish"
-					>
-						الوصف بالإنجليزية
-					</label>
-					<ReactQuill
-						id="descriptionEnglish"
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						{...register("descriptionEnglish")}
-						onChange={(value) => setValue("descriptionEnglish", value)}
-					/>
-				</div>
-				<div className="mb-4">
-					<label
-						className="block text-gray-700 text-sm font-bold mb-2"
-						htmlFor="descriptionRussian"
-					>
-						الوصف بالروسية
-					</label>
-					<ReactQuill
-						id="descriptionRussian"
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						{...register("descriptionRussian")}
-						onChange={(value) => setValue("descriptionRussian", value)}
-					/>
-				</div>
+				{/* ReachEditor for descriptions */}
+				<ReachEditor id="description" register={register} setValue={setValue} required />
+				<ReachEditor id="descriptionEnglish" register={register} setValue={setValue} />
+				<ReachEditor id="descriptionRussian" register={register} setValue={setValue} />
+
 				<div className="mb-4">
 					<label
 						className="block text-gray-700 text-sm font-bold mb-2"
